@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://pyscript.net/releases/2026.7.3/core.css">
+    <script type="module" src="https://pyscript.net/releases/2026.7.3/core.js"></script>
+
+    <title>Working with Sets</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        margin: 0;
+        padding: 45px 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        background:
+            radial-gradient(ellipse at 50% 0%, #164b91 0%, transparent 55%),
+            linear-gradient(145deg, #030817, #071a38 55%, #100719);
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Comic-book atmosphere */
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image: radial-gradient(
+            rgba(255, 40, 60, 0.45) 1.5px,
+            transparent 1.5px
+        );
+        background-size: 19px 19px;
+        mask-image: linear-gradient(
+            135deg,
+            black,
+            transparent 35%,
+            transparent 65%,
+            black
+        );
+        opacity: 0.35;
+    }
+
+    /* Red and blue energy streaks */
+    body::after {
+        content: "✦  ✧  ✦";
+        position: fixed;
+        top: 12px;
+        right: 18px;
+        font-size: 35px;
+        color: #ff334f;
+        text-shadow: 0 0 18px #ff173b, 0 0 35px #1769ff;
+        pointer-events: none;
+    }
+
+    /* RESULTS / MEMBER DASHBOARD */
+    #results {
+        width: 100%;
+        max-width: 540px;
+        padding: 25px;
+        margin-bottom: 28px;
+        border: 1px solid rgba(89, 177, 255, 0.55);
+        border-top: 5px solid #ff293f;
+        border-radius: 18px;
+        color: #eaf3ff;
+        background:
+            linear-gradient(145deg, rgba(18, 39, 75, 0.98),
+            rgba(5, 13, 32, 0.98));
+        box-shadow:
+            0 0 12px rgba(255, 35, 65, 0.25),
+            0 0 35px rgba(0, 112, 255, 0.2),
+            0 18px 40px rgba(0, 0, 0, 0.4);
+        overflow-wrap: anywhere;
+        line-height: 1.6;
+        font-size: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    #results:empty {
+        display: none;
+    }
+
+    /* Form card */
+    form {
+        width: 100%;
+        max-width: 540px;
+        padding: 36px;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+        border: 1px solid rgba(100, 175, 255, 0.65);
+        border-top: 6px solid #ff293f;
+        border-bottom: 6px solid #1769ff;
+        border-radius: 20px;
+        background: linear-gradient(145deg, #ffffff, #eaf2ff);
+        color: #102345;
+        box-shadow:
+            0 0 18px rgba(255, 35, 65, 0.22),
+            0 0 40px rgba(0, 105, 255, 0.22),
+            0 20px 45px rgba(0, 0, 0, 0.4);
+    }
+
+    form label:first-child {
+        display: block;
+        font-size: 29px;
+        font-weight: 900;
+        letter-spacing: -0.7px;
+        color: #e62435;
+        text-shadow: 1px 2px 0 #ffd6dc;
+        margin-bottom: 12px;
+    }
+
+    form label:first-child::after {
+        content: "SPIDER-VERSE • MEMBER REGISTRATION";
+        display: block;
+        margin-top: 12px;
+        color: #1769e0;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-shadow: none;
+    }
+
+    form label:not(:first-child) {
+        display: block;
+        margin-top: 23px;
+        margin-bottom: 9px;
+        color: #142b50;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    input[type="text"] {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 18px;
+        border: 2px solid #cbd9ee;
+        border-radius: 10px;
+        background: #f8fbff;
+        color: #102345;
+        font-size: 16px;
+        outline: none;
+        transition: 0.25s ease;
+    }
+
+    input[type="text"]:focus {
+        border-color: #1769ff;
+        background: white;
+        box-shadow:
+            0 0 0 4px rgba(23, 105, 255, 0.13),
+            0 0 18px rgba(23, 105, 255, 0.15);
+    }
+
+    input[type="text"]::placeholder {
+        color: #8796ad;
+    }
+
+    input[type="button"] {
+        display: block;
+        width: 100%;
+        padding: 16px;
+        margin-top: 12px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(100deg, #ed1d35, #bd1029);
+        color: white;
+        font-size: 17px;
+        font-weight: 900;
+        letter-spacing: 1.5px;
+        cursor: pointer;
+        box-shadow: 0 6px 0 #800b20, 0 0 18px rgba(237, 29, 53, 0.3);
+        transition: 0.2s ease;
+    }
+
+    input[type="button"]::after {
+        content: " ⚡";
+    }
+
+    input[type="button"]:hover {
+        background: linear-gradient(100deg, #1769ff, #0843b5);
+        box-shadow: 0 6px 0 #062b70, 0 0 22px rgba(23, 105, 255, 0.5);
+        transform: translateY(-2px);
+    }
+
+    input[type="button"]:active {
+        transform: translateY(3px);
+        box-shadow: 0 2px 0 #062b70;
+    }
+
+    @media (max-width: 480px) {
+        body {
+            padding: 35px 15px;
+        }
+
+        form {
+            padding: 26px 22px;
+        }
+
+        form label:first-child {
+            font-size: 24px;
+        }
+
+        #results {
+            padding: 20px;
+        }
+    }
+</style>
+</head>
+
+<body>
+    <div id="results"></div>
+
+    <form onsubmit="return false;">
+        <label>Add New Club Member</label>
+
+        <label for="fname">First Name</label>
+        <input type="text" id="fname" placeholder="Enter first name">
+
+        <label for="surname">Last Name</label>
+        <input type="text" id="surname" placeholder="Enter last name">
+
+        <input type="button" py-click="submit" value="Submit">
+    </form>
+
+    <script type="py" src="main.py"></script>
+</body>
+</html>
